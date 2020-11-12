@@ -37,6 +37,11 @@ class CreateTransactionService {
     });
 
     await transactionsRepository.save(transaction);
+    delete transaction.category_id;
+    delete transaction.created_at;
+    delete transaction.updated_at;
+    transaction.category = categoryData.title;
+
     return transaction;
   }
 }
