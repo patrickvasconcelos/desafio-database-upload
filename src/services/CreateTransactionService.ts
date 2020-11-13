@@ -29,6 +29,8 @@ class CreateTransactionService {
 
     const transactionsRepository = getCustomRepository(TransactionsRepository);
 
+    const { total } = await transactionsRepository.getBalance();
+
     const transaction = await transactionsRepository.create({
       title,
       value,
@@ -36,11 +38,16 @@ class CreateTransactionService {
       category_id: categoryData.id,
     });
 
+    if (type === 'outcome' && total < value) {
+      console.log(total, value, type);
+
+      throw new AppError('outcome is bigger then total');
+    }
     await transactionsRepository.save(transaction);
-    delete transaction.category_id;
-    delete transaction.created_at;
-    delete transaction.updated_at;
-    transaction.category = categoryData.title;
+    // delete transaction.category_id;
+    // delete transaction.created_at;
+    // delete transaction.updated_at;
+    transaction.category = categoryData;
 
     return transaction;
   }
